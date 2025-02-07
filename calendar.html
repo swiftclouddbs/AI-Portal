@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2025 Calendar with Notes</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #d0e7ff;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #003366;
+    }
+    .calendar-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .month {
+      background: #e3f2fd;
+      border: 2px solid #003366;
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+      color: #003366;
+    }
+    .month h2 {
+      font-size: 24px;
+      color: #003366;
+      margin-bottom: 10px;
+    }
+    .days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+    }
+    .day-initials {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+      font-weight: bold;
+      color: #003366;
+      margin-bottom: 5px;
+    }
+    .day {
+      padding: 10px;
+      background: #cce7ff;
+      color: #003366;
+      border-radius: 5px;
+      text-align: center;
+      cursor: pointer;
+    }
+    .day.has-note {
+      color: yellow;
+      font-weight: bold;
+    }
+    .day:hover {
+      background: #8ab6ff;
+    }
+    #reminderModal {
+      display: none;
+      position: fixed;
+      background: rgba(0, 0, 0, 0.6);
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      justify-content: center;
+      align-items: center;
+    }
+    .reminder-form {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 10px;
+      width: 300px;
+      text-align: center;
+    }
+    input[type="text"] {
+      width: 90%;
+      padding: 8px;
+      margin-top: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    button {
+      background: #003366;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover {
+      background: #002244;
+    }
+  </style>
+</head>
+<body>
+  <h1>AI Portal <br> 2025 Calendar with Notes</h1>
+  <div class="calendar-container" id="calendar"></div>
+
+  <div id="reminderModal">
+    <div class="reminder-form">
+      <h2 id="modalTitle">Add Note for Date</h2>
+      <label for="reminderText">Note (max 100 characters):</label>
+      <input type="text" id="reminderText" maxlength="100" placeholder="Enter your note"><br><br>
+      <button onclick="saveReminder()">Save</button>
+      <button onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+
+  <script>
+    const calendarEl = document.getElementById("calendar");
+    const modal = document.getElementById("reminderModal");
+    let selectedDateEl;
+    let selectedDateKey;
+    const monthNames = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+    const dayInitials = ["S", "M", "T", "W", "T", "F", "S"];
+
+    function generateCalendar() {
+      for (let month = 0; month < 12; month++) {
+        const monthEl = document.createElement("div");
+        monthEl.className = "month";
+
+        const monthTitle = document.createElement("h2");
+        monthTitle.textContent = monthNames[month];
+        monthEl.appendChild(monthTitle);
+
+        const dayInitialsRow = document.createElement("div");
+        dayInitialsRow.className = "day-initials";
+
+        dayInitials.forEach(day => {
+          const dayEl = document.createElement("div");
+          dayEl.textContent = day;
+          dayInitialsRow.appendChild(dayEl);
+        });
+
+        monthEl.appendChild(dayInitialsRow);
+
+        const daysContainer = document.createElement("div");
+        daysContainer.className = "days";
+
+        const daysInMonth = new Date(2025, month + 1, 0).getDate();
+        const firstDay = new Date(2025, month, 1).getDay();
+
+        for (let i = 0; i < firstDay; i++) {
+          const emptyEl = document.createElement("div");
+          daysContainer.appendChild(emptyEl);
+        }
+
+        for (let day = 1; day <= daysInMonth; day++) {
+          const dayEl = document.createElement("div");
+          dayEl.className = "day";
+          dayEl.textContent = day;
+          const dateKey = `${monthNames[month]} ${day}, 2025`;
+          
+          // Highlight if a note already exists
+          if (localStorage.getItem(`reminder-${dateKey}`)) {
+            dayEl.classList.add('has-note');
+          }
+
+          dayEl.onclick = () => openModal(dateKey, dayEl);
+          daysContainer.appendChild(dayEl);
+        }
+
+        monthEl.appendChild(daysContainer);
+        calendarEl.appendChild(monthEl);
+      }
+    }
+
+    function openModal(dateKey, dayEl) {
+      selectedDateKey = dateKey;
+      selectedDateEl = dayEl;
+      document.getElementById("modalTitle").textContent = `Add Note for ${selectedDateKey}`;
+      document.getElementById("reminderText").value = localStorage.getItem(`reminder-${selectedDateKey}`) || "";
+      modal.style.display = 'flex';
+    }
+
+    function closeModal() {
+      modal.style.display = 'none';
+    }
+
+    function saveReminder() {
+      const reminderText = document.getElementById('reminderText').value;
+      if (reminderText) {
+        localStorage.setItem(`reminder-${selectedDateKey}`, reminderText);
+        selectedDateEl.classList.add('has-note');
+      } else {
+        localStorage.removeItem(`reminder-${selectedDateKey}`);
+        selectedDateEl.classList.remove('has-note');
+      }
+      closeModal();
+    }
+
+    window.onload = generateCalendar;
+  </script>
+</body>
+</html>
