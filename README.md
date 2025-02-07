@@ -3,7 +3,8 @@
 Add calendar app.  considering EO revoking EO 14110.
 
 https://www.nist.gov/privacy-framework/privacy-framework
-https://airc.nist.gov/airmf-resources/playbook/
+
+https://opencv.org/university/free-courses/?utm_source=opcv&utm_medium=menu&utm_campaign=obc#explore
 
 NIST JOINT FRAMEWORKS DATA GOVERNANCE AND MANAGEMENT PROFILE CONCEPT PAPER
 June 18, 2024
